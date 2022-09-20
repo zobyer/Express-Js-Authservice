@@ -2,4 +2,8 @@ function load(req, res) {
   return res.json(req.query)
 }
 
-module.exports = { load }
+function create(req, res) {
+  return res.json(req.body)
+}
+
+module.exports = { load, create }
