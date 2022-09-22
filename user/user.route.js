@@ -1,13 +1,15 @@
 const express = require("express")
 const router = express.Router() // eslint-disable-line new-cap
-const { validate } = require("express-validation")
 
 const UserControl = require("./user.controller")
 const UserValidation = require("./user.validation")
 
+const validateDto = require("../middleware/validate.registration")
+const devDto = require("../dto/registration")
+
 router
   .route("/")
   .get(UserControl.load)
-  .post(validate(UserValidation.createUser), UserControl.create)
+  .post(validateDto(devDto), UserControl.create)
 
 module.exports = router

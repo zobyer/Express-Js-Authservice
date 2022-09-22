@@ -2,11 +2,10 @@ const express = require("express")
 const app = express()
 const mongoose = require("mongoose")
 const bodyParser = require("body-parser")
-const expressValidation = require("express-validation")
+require("dotenv/config")
 
 const userRoutes = require("./index.router")
-const APIError = require("./helpers/APIError")
-require("dotenv/config")
+const apiErrorHandler = require("./error/api.error-handler")
 
 //Convert request to JSON
 app.use(bodyParser.json())
@@ -25,22 +24,7 @@ mongoose.connection.on("error", function (err) {
 })
 
 //Validation Error
-// if error is not an instanceOf APIError, convert it.
-app.use((err, req, res, next) => {
-  if (err instanceof expressValidation.ValidationError) {
-    // validation error contains errors which is an array of error each containing message[]
-    console.log()
-    const unifiedErrorMessage = err.errors
-      .map((error) => error.messages.join(". "))
-      .join(" and ")
-    const error = new APIError(unifiedErrorMessage, err.status, true)
-    return next(error)
-  } else if (!(err instanceof APIError)) {
-    const apiError = new APIError(err.message, err.status, err.isPublic)
-    return next(apiError)
-  }
-  return next(err)
-})
+app.use(apiErrorHandler)
 
 //Starting server port
 app.listen(process.env.PORT)
