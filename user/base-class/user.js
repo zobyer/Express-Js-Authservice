@@ -7,7 +7,9 @@ class AuthUser {
 
   async findUserByuserName() {
     try {
-      const userDetails = await User.find({ username: this.userName });
+      const userDetails = await User.findOne({
+        username: this.userName,
+      }).exec();
       return userDetails;
     } catch (error) {
       return error;

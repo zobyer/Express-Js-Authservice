@@ -5,17 +5,13 @@ const AuthUser = require("./base-class/user");
 const ApiError = require("../error/api.error");
 const ApiSuccess = require("../success/api.success");
 
-function load(req, res) {
-  return res.json(req.query);
-}
-
 async function create(req, res) {
   try {
     const reqUser = new AuthUser(req.body.username);
     const existingUser = await reqUser.findUserByuserName();
 
-    if (existingUser.length > 0) {
-      const apiError = ApiError.badRequest("user already exists");
+    if (existingUser != null) {
+      const apiError = ApiError.badRequest("User already exists");
       return res.status(409).json(apiError);
     }
   } catch (error) {
@@ -42,4 +38,25 @@ async function create(req, res) {
   }
 }
 
-module.exports = { load, create };
+async function login(req, res) {
+  const body = req.body;
+  const reqUser = new AuthUser(body.username);
+  try {
+    const existingUser = await reqUser.findUserByuserName();
+    if (existingUser == null) {
+      const apiError = ApiError.badRequest("User not Found");
+      return res.status(409).json(apiError);
+    }
+
+    const validPassword = await bcrypt.compare(
+      body.password,
+      existingUser.password
+    );
+
+    return res.json(validPassword);
+  } catch (error) {
+    return res.send(error);
+  }
+}
+
+module.exports = { login, create };

@@ -1,15 +1,15 @@
 const express = require("express");
 const router = express.Router(); // eslint-disable-line new-cap
 
-const UserControl = require("./user.controller");
-const UserValidation = require("./user.validation");
+const UserController = require("./user.controller");
 
-const validateDto = require("../middleware/validate.registration");
-const devDto = require("../dto/registration");
+const validateDto = require("../middleware/validate.request");
+const registrationDto = require("../dto/registration");
+const loginDto = require("../dto/login");
 
 router
   .route("/registration")
-  .get(UserControl.load)
-  .post(validateDto(devDto), UserControl.create);
+  .post(validateDto(registrationDto), UserController.create);
+router.route("/login").post(validateDto(loginDto), UserController.login);
 
 module.exports = router;
