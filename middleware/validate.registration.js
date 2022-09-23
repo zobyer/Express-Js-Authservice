@@ -1,18 +1,18 @@
-const ApiError = require("../error/api.error")
+const ApiError = require("../error/api.error");
 
 function validateDto(schema) {
   return async (req, res, next) => {
     try {
-      const validatedBody = await schema.validate(req.body)
+      const validatedBody = await schema.validate(req.body);
       // replace request body with validated schema object
       // so that default values are applied to the DTO
-      req.body = validatedBody
+      req.body = validatedBody;
 
-      next()
+      next();
     } catch (err) {
-      next(ApiError.badRequest(err))
+      next(ApiError.badRequest(err.errors[0]));
     }
-  }
+  };
 }
 
-module.exports = validateDto
+module.exports = validateDto;
