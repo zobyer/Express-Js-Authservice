@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const User = require("./user.model");
 const AuthUser = require("./base-class/user");
+const Token = require("./base-class/token");
 const ApiError = require("../error/api.error");
 const ApiSuccess = require("../success/api.success");
 
@@ -53,7 +54,23 @@ async function login(req, res) {
       existingUser.password
     );
 
-    return res.json(validPassword);
+    if (!validPassword) {
+      return res.status(401).json(ApiError.badRequest("Invalid Credentials"));
+    }
+
+    const accessToken = Token.generateAccessToken({
+      name: existingUser.username,
+    });
+    const refreshToken = Token.generateRefreshToken({
+      name: existingUser.username,
+    });
+
+    const successResponse = {
+      username: body.username,
+      access_token: accessToken,
+      refreshToken: refreshToken,
+    };
+    return res.status(200).json(ApiSuccess.successRequest(successResponse));
   } catch (error) {
     return res.send(error);
   }
