@@ -11,5 +11,10 @@ router
   .route("/registration")
   .post(validateDto(registrationDto), UserController.create);
 router.route("/login").post(validateDto(loginDto), UserController.login);
+router
+  .route("/gen-new-access-token")
+  .post(UserController.generateNewAccessToken);
+
+router.route("/logout").get(UserController.logout);
 
 module.exports = router;

@@ -1,4 +1,4 @@
-const User = require("../user.model");
+const User = require("../model/user.model");
 
 class AuthUser {
   constructor(username) {
@@ -15,6 +15,8 @@ class AuthUser {
       return error;
     }
   }
+
+  static userBasicDetails(user) {}
 }
 
 module.exports = AuthUser;

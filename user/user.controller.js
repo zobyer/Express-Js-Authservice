@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
-const User = require("./user.model");
+const User = require("./model/user.model");
+const RefreshToken = require("./model/refresh-token.model");
 const AuthUser = require("./base-class/user");
 const Token = require("./base-class/token");
 const ApiError = require("../error/api.error");
@@ -48,7 +49,6 @@ async function login(req, res) {
       const apiError = ApiError.badRequest("User not Found");
       return res.status(409).json(apiError);
     }
-
     const validPassword = await bcrypt.compare(
       body.password,
       existingUser.password
@@ -61,14 +61,18 @@ async function login(req, res) {
     const accessToken = Token.generateAccessToken({
       name: existingUser.username,
     });
-    const refreshToken = Token.generateRefreshToken({
-      name: existingUser.username,
-    });
+
+    const refreshToken = Token.generateRefreshToken(
+      existingUser,
+      body.ip_address
+    );
+
+    await refreshToken.save();
 
     const successResponse = {
       username: body.username,
       access_token: accessToken,
-      refreshToken: refreshToken,
+      refreshToken: refreshToken.token,
     };
     return res.status(200).json(ApiSuccess.successRequest(successResponse));
   } catch (error) {
@@ -76,4 +80,35 @@ async function login(req, res) {
   }
 }
 
-module.exports = { login, create };
+async function generateNewAccessToken(req, res) {
+  const body = req.body;
+  try {
+    const existingRefreshToken = await RefreshToken.findOne({
+      token: body.refresh_token,
+    })
+      .populate("user")
+      .exec();
+
+    if (existingRefreshToken == null) {
+      return res.status(403).json(ApiError.forbidden("Invalid token"));
+    }
+    const accessToken = Token.generateAccessToken({
+      name: existingRefreshToken.user.username,
+    });
+
+    const successResponse = {
+      username: existingRefreshToken.user.username,
+      access_token: accessToken,
+      refreshToken: existingRefreshToken.token,
+    };
+    return res.json(ApiSuccess.successRequest(successResponse));
+  } catch (error) {
+    return res.send(error);
+  }
+}
+
+function logout(req, res) {
+  return res.json(req.body);
+}
+
+module.exports = { login, create, generateNewAccessToken, logout };
