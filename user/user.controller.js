@@ -108,7 +108,9 @@ async function generateNewAccessToken(req, res) {
 }
 
 function logout(req, res) {
-  return res.json(req.body);
+  console.log("called controller", req.body);
+
+  return res.send("logout response");
 }
 
 module.exports = { login, create, generateNewAccessToken, logout };

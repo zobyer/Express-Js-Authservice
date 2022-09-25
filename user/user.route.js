@@ -3,6 +3,7 @@ const router = express.Router(); // eslint-disable-line new-cap
 
 const UserController = require("./user.controller");
 
+const protectAuthRoute = require("../middleware/auth.route");
 const validateDto = require("../middleware/validate.request");
 const registrationDto = require("../dto/registration");
 const loginDto = require("../dto/login");
@@ -15,6 +16,6 @@ router
   .route("/gen-new-access-token")
   .post(UserController.generateNewAccessToken);
 
-router.route("/logout").get(UserController.logout);
+router.route("/logout").get(protectAuthRoute, UserController.logout);
 
 module.exports = router;
