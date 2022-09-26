@@ -16,6 +16,6 @@ router
   .route("/gen-new-access-token")
   .post(UserController.generateNewAccessToken);
 
-router.route("/logout").get(protectAuthRoute, UserController.logout);
+router.route("/logout").post(protectAuthRoute, UserController.logout);
 
 module.exports = router;

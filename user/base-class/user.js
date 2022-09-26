@@ -6,6 +6,7 @@ class AuthUser {
   }
 
   async findUserByuserName() {
+    console.log(this.userName);
     try {
       const userDetails = await User.findOne({
         username: this.userName,

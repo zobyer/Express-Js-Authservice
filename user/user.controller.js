@@ -91,6 +91,8 @@ async function generateNewAccessToken(req, res) {
 
     if (existingRefreshToken == null) {
       return res.status(403).json(ApiError.forbidden("Invalid token"));
+    } else if (!existingRefreshToken.isActive) {
+      return res.status(403).json(ApiError.forbidden("Invalid token"));
     }
     const accessToken = Token.generateAccessToken({
       name: existingRefreshToken.user.username,
@@ -107,10 +109,19 @@ async function generateNewAccessToken(req, res) {
   }
 }
 
-function logout(req, res) {
-  console.log("called controller", req.body);
+async function logout(req, res) {
+  try {
+    const user = new AuthUser(req.body.user.name);
+    const authUser = await user.findUserByuserName();
+    const refreshToken = await Token.getRefreshTokenByUserId(authUser._id);
+    refreshToken.revoked = Date.now();
+    refreshToken.revokedByIp = req.body.ip_address;
+    await refreshToken.save();
 
-  return res.send("logout response");
+    return res.json(ApiSuccess.successRequest("Successfully logged out"));
+  } catch (error) {
+    return res.send(error);
+  }
 }
 
 module.exports = { login, create, generateNewAccessToken, logout };

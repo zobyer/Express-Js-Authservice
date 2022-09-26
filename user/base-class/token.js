@@ -30,6 +30,13 @@ class Token {
       console.log("error");
     }
   }
+
+  static async getRefreshTokenByUserId(userId) {
+    const refreshToken = await RefreshToken.findOne({ user: userId })
+      .populate("user")
+      .exec();
+    return refreshToken;
+  }
 }
 
 module.exports = Token;
