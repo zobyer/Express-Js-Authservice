@@ -14,7 +14,6 @@ async function create(req, res) {
   try {
     const reqUser = new AuthUser(req.body.email);
     const existingUser = await reqUser.findUserByuserName();
-    console.log(existingUser);
     if (existingUser) {
       return res
         .status(409)
@@ -90,13 +89,15 @@ async function login(req, res) {
 async function checkIfNewUser(req, res) {
   try {
     const existingUser = await User.findOne({
-      email: req.query.email,
+      email: req.body.email,
     }).exec();
 
     console.log(existingUser);
     if (existingUser) {
       return res.status(200).json({
-        email: existingUser.email,
+        success: true,
+        isNewUser: false,
+        message: "User exists",
       });
     }
     return res.status(200).json({

@@ -13,7 +13,9 @@ router
   .route("/registration")
   .post(validateDto(registrationDto), UserController.create);
 
-router.route("/check-user").get(UserController.checkIfNewUser);
+router
+  .route("/check-user")
+  .post(validateDto(checkUser), UserController.checkIfNewUser);
 
 router.route("/login").post(validateDto(loginDto), UserController.login);
 router
