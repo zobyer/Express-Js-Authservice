@@ -48,12 +48,14 @@ async function create(req, res) {
 
 async function login(req, res) {
   const body = req.body;
-  const reqUser = new AuthUser(body.username);
+  const reqUser = new AuthUser(body.email);
   try {
     const existingUser = await reqUser.findUserByuserName();
-    if (existingUser == null) {
-      const apiError = ApiError.badRequest("User not Found");
-      return res.status(409).json(apiError);
+    if (!existingUser) {
+      //      const apiError = ApiError.badRequest("User not Found");
+      return res
+        .status(409)
+        .json({ success: false, message: "User not found" });
     }
     const validPassword = await bcrypt.compare(
       body.password,
@@ -61,26 +63,28 @@ async function login(req, res) {
     );
 
     if (!validPassword) {
-      return res.status(401).json(ApiError.badRequest("Invalid Credentials"));
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid credentials" });
     }
 
-    const accessToken = Token.generateAccessToken({
-      name: existingUser.username,
-    });
+    // const accessToken = Token.generateAccessToken({
+    //   name: existingUser.username,
+    // });
 
-    const refreshToken = Token.generateRefreshToken(
-      existingUser,
-      body.ip_address
-    );
+    // const refreshToken = Token.generateRefreshToken(
+    //   existingUser,
+    //   body.ip_address
+    // );
 
-    await refreshToken.save();
+    //  await refreshToken.save();
 
     const successResponse = {
-      username: body.username,
-      access_token: accessToken,
-      refreshToken: refreshToken.token,
+      success: true,
+      message: "Logged In Successfully",
+      user: modifyUser(existingUser),
     };
-    return res.status(200).json(ApiSuccess.successRequest(successResponse));
+    return res.status(200).json(successResponse);
   } catch (error) {
     return res.send(error);
   }
@@ -92,7 +96,6 @@ async function checkIfNewUser(req, res) {
       email: req.body.email,
     }).exec();
 
-    console.log(existingUser);
     if (existingUser) {
       return res.status(200).json({
         success: true,

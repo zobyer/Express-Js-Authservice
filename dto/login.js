@@ -1,6 +1,6 @@
 const yup = require("yup");
 
 module.exports = yup.object().shape({
-  username: yup.string().required(),
+  email: yup.string().trim().email().required(),
   password: yup.string().required("Please Enter your password"),
 });
