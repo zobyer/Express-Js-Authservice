@@ -12,10 +12,10 @@ const { modifyUser } = require("../helper/modifyUser");
 
 async function create(req, res) {
   try {
-    const reqUser = new AuthUser(req.body.username);
+    const reqUser = new AuthUser(req.body.email);
     const existingUser = await reqUser.findUserByuserName();
-
-    if (existingUser != null) {
+    console.log(existingUser);
+    if (existingUser) {
       return res
         .status(409)
         .json({ success: false, message: "User already exists" });
@@ -87,6 +87,28 @@ async function login(req, res) {
   }
 }
 
+async function checkIfNewUser(req, res) {
+  try {
+    const existingUser = await User.findOne({
+      email: req.query.email,
+    }).exec();
+
+    console.log(existingUser);
+    if (existingUser) {
+      return res.status(200).json({
+        email: existingUser.email,
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      isNewUser: true,
+      message: "This is a new user",
+    });
+  } catch (error) {
+    return res.send(error);
+  }
+}
+
 async function generateNewAccessToken(req, res) {
   const body = req.body;
   try {
@@ -131,4 +153,10 @@ async function logout(req, res) {
   }
 }
 
-module.exports = { login, create, generateNewAccessToken, logout };
+module.exports = {
+  login,
+  create,
+  generateNewAccessToken,
+  logout,
+  checkIfNewUser,
+};

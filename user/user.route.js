@@ -7,10 +7,14 @@ const protectAuthRoute = require("../middleware/auth.route");
 const validateDto = require("../middleware/validate.request");
 const registrationDto = require("../dto/registration");
 const loginDto = require("../dto/login");
+const checkUser = require("../dto/checkUser");
 
 router
   .route("/registration")
   .post(validateDto(registrationDto), UserController.create);
+
+router.route("/check-user").get(UserController.checkIfNewUser);
+
 router.route("/login").post(validateDto(loginDto), UserController.login);
 router
   .route("/gen-new-access-token")

@@ -9,7 +9,7 @@ class AuthUser {
     console.log(this.userName);
     try {
       const userDetails = await User.findOne({
-        username: this.userName,
+        email: this.userName,
       }).exec();
       return userDetails;
     } catch (error) {
