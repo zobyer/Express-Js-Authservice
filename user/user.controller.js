@@ -2,10 +2,13 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const User = require("./model/user.model");
 const RefreshToken = require("./model/refresh-token.model");
+const dayjs = require("dayjs");
+
 const AuthUser = require("./base-class/user");
 const Token = require("./base-class/token");
 const ApiError = require("../error/api.error");
 const ApiSuccess = require("../success/api.success");
+const { modifyUser } = require("../helper/modifyUser");
 
 async function create(req, res) {
   try {
@@ -13,8 +16,9 @@ async function create(req, res) {
     const existingUser = await reqUser.findUserByuserName();
 
     if (existingUser != null) {
-      const apiError = ApiError.badRequest("User already exists");
-      return res.status(409).json(apiError);
+      return res
+        .status(409)
+        .json({ success: false, message: "User already exists" });
     }
   } catch (error) {
     return res.send(error);
@@ -22,18 +26,21 @@ async function create(req, res) {
 
   const hashedPwd = await bcrypt.hash(req.body.password, saltRounds);
   const user = new User({
-    username: req.body.username,
     name: req.body.name,
     password: hashedPwd,
-    service_name: req.body.service_name,
-    service_id: req.body.service_id,
+    email: req.body.email,
+    date_of_birth: dayjs(req.body.dateOfBirth).format("YYYY-MM-DD hh:mm A"),
   });
 
   try {
     // const doesUserExists = await User.find({ username: req.body.username });
 
     const savedUser = await user.save();
-    return res.status(200).json(ApiSuccess.successRequest(savedUser));
+    return res.status(200).json({
+      success: true,
+      message: "User created successfully",
+      user: modifyUser(savedUser),
+    });
   } catch (error) {
     console.log(error);
     return res.send(error);
