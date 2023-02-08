@@ -25,6 +25,7 @@ async function create(req, res) {
 
   const hashedPwd = await bcrypt.hash(req.body.password, saltRounds);
   const user = new User({
+    id: req.body.id,
     name: req.body.name,
     password: hashedPwd,
     email: req.body.email,
@@ -41,7 +42,7 @@ async function create(req, res) {
       user: modifyUser(savedUser),
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.send(error);
   }
 }

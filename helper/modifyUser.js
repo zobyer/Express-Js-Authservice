@@ -3,6 +3,7 @@ const dayjs = require("dayjs");
 const modifyUser = (user) => {
   console.log(user);
   return {
+    id: user.id,
     name: user.name,
     email: user.email,
     dateOfBirth: dayjs(user.date_of_birth).format("YYYY-MM-DD hh:mm A"),
