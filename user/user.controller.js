@@ -157,10 +157,20 @@ async function logout(req, res) {
   }
 }
 
+async function clearDB(req, res) {
+  try {
+    await User.deleteMany();
+    return res.status(200).json({ success: true, message: "DB cleared" });
+  } catch (error) {
+    return res.send(error);
+  }
+}
+
 module.exports = {
   login,
   create,
   generateNewAccessToken,
   logout,
   checkIfNewUser,
+  clearDB,
 };

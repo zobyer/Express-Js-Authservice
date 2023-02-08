@@ -23,5 +23,6 @@ router
   .post(UserController.generateNewAccessToken);
 
 router.route("/logout").post(protectAuthRoute, UserController.logout);
+router.route("/clear-db").post(UserController.clearDB);
 
 module.exports = router;
